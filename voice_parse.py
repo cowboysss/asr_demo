@@ -3,6 +3,7 @@ from aip import AipSpeech
 from playsound import playsound
 import wave
 from pyaudio import PyAudio,paInt16
+import os
 
 class parse_zh(object):
 
@@ -41,7 +42,8 @@ class parse_zh(object):
         if not isinstance(self._ret_voice, dict):
             with open('audio.mp3', 'wb') as f:
                 f.write(self._ret_voice)
-            playsound('audio.mp3')
+            os.system('omxplayer audio.mp3')
+            # playsound('audio.mp3')
         return self._ret_voice
 
     def save_wave_file(self,filename, data):
