@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 from aip import AipSpeech
 from playsound import playsound
+import wave
+from pyaudio import PyAudio,paInt16
 
 class parse_zh(object):
 
@@ -10,15 +12,26 @@ class parse_zh(object):
         self._SECRET_KEY = '9d2a195cc287eaef7e96572e0370b67b'
         self._client = AipSpeech(self._APP_ID, self._API_KEY, self._SECRET_KEY)
 
+        self._chuck = 1024
+        self._sample_rate = 16000
+        self._channels = 1
+        self._samplewidth = 2
+        self._sample_time = 4 # s
+
+        self._record_speech_name = 'recorded_speech.wav' 
+
     # 读取文件
     def get_file_content(self,filePath):
         with open(filePath, 'rb') as fp:
             return fp.read()
     
     def get_result(self):
-        self._req = self._client.asr(self.get_file_content('16k.wav'), 'pcm', 16000, {
+        self.record_voice()
+        print('parsing speech...')
+        self._req = self._client.asr(self.get_file_content(self._record_speech_name), 'pcm', self._sample_rate, {
             'lan': 'zh',
         })
+        print(self._req)
         return self._req['result'][0],self._req['err_no']
 
     def get_voice(self, msg):
@@ -31,5 +44,33 @@ class parse_zh(object):
             playsound('audio.mp3')
         return self._ret_voice
 
-def record_voice(savename):
-    pass
+    def save_wave_file(self,filename, data):
+        '''save the date to the wav file'''
+        wf = wave.open(filename, 'wb')
+        wf.setnchannels(self._channels)
+        wf.setsampwidth(self._samplewidth)
+        wf.setframerate(self._sample_rate)
+        wf.writeframes(b"".join(data))
+        wf.close()
+
+    def record_voice(self):
+        #open the input of wave
+        pa = PyAudio()
+        stream = pa.open(format = paInt16, channels = self._channels,
+                rate = self._sample_rate, input = True,
+                frames_per_buffer = self._chuck)
+        save_buffer = []
+        print('recording...')
+        for i in range(0, int(self._sample_rate/self._chuck*self._sample_time)):
+            data = stream.read(self._chuck)
+            save_buffer.append(data)
+
+        stream.stop_stream()
+        stream.close()
+        pa.terminate()
+    
+        # datetime.now().strftime("%Y-%m-%d_%H_%M_%S")+".wav"
+        self.save_wave_file(self._record_speech_name, save_buffer)
+        save_buffer = []
+        print(self._record_speech_name, "saved")
+        print('speech record OK!')    
