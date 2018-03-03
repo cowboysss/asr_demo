@@ -13,8 +13,8 @@ class parse_zh(object):
         self._SECRET_KEY = '9d2a195cc287eaef7e96572e0370b67b'
         self._client = AipSpeech(self._APP_ID, self._API_KEY, self._SECRET_KEY)
 
-        self._chuck = 1024
-        self._sample_rate = 16000
+        self._chuck = 4096
+        self._sample_rate =44100
         self._channels = 1
         self._samplewidth = 2
         self._sample_time = 4 # s
@@ -29,7 +29,7 @@ class parse_zh(object):
     def get_result(self):
         self.record_voice()
         print('parsing speech...')
-        self._req = self._client.asr(self.get_file_content(self._record_speech_name), 'pcm', self._sample_rate, {
+        self._req = self._client.asr(self.get_file_content("recorded_speech.pcm"), 'pcm', 16000, {
             'lan': 'zh',
         })
         print(self._req)
@@ -58,13 +58,11 @@ class parse_zh(object):
     def record_voice(self):
         #open the input of wave
         pa = PyAudio()
-        stream = pa.open(format = paInt16, channels = self._channels,
-                rate = self._sample_rate, input = True,
-                frames_per_buffer = self._chuck)
+        stream = pa.open(format = paInt16, channels = self._channels, rate = self._sample_rate, input = True,input_device_index=2 ,frames_per_buffer = self._chuck)
         save_buffer = []
         print('recording...')
         for i in range(0, int(self._sample_rate/self._chuck*self._sample_time)):
-            data = stream.read(self._chuck)
+            data = stream.read(self._chuck, exception_on_overflow = False)
             save_buffer.append(data)
 
         stream.stop_stream()
@@ -75,4 +73,6 @@ class parse_zh(object):
         self.save_wave_file(self._record_speech_name, save_buffer)
         save_buffer = []
         print(self._record_speech_name, "saved")
-        print('speech record OK!')    
+        print('speech record OK!')
+        os.system("ffmpeg -y -f s16le -ac 1 -ar 44100 -i recorded_speech.wav -acodec pcm_s16le -f s16le -ac 1 -ar 16000 recorded_speech.pcm -loglevel -8")
+    
