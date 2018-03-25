@@ -2,7 +2,7 @@
 import voice_parse as vp
 
 client = vp.parse_zh()
-
+client.record_voice()
 msg,num = client.get_result()
 if num!=0:
     print('voice did not parse!')

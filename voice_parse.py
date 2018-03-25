@@ -27,7 +27,7 @@ class parse_zh(object):
             return fp.read()
     
     def get_result(self):
-        self.record_voice()
+        # self.record_voice()
         print('parsing speech...')
         self._req = self._client.asr(self.get_file_content("recorded_speech.pcm"), 'pcm', 16000, {
             'lan': 'zh',

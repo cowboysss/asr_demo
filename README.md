@@ -1,6 +1,12 @@
 ## 程序文件说明
-demo.py为主要的运行文件
-voice_parse.py为相应的class文件和函数文件
+demo.py为录音和语音识别的测试运行文件
+record_demo.py 是录音的测试运行文件
+unit_nlp.py 是SnowNlp的测试运行文件
+unit_nlp.py 是Baidu云NLP识别的测试文件
+
+server.py 是main文件，服务部分的程序运行该文件
+voice_parse.py为录音和语音识别的class文件和函数文件
+
 基于Python 3.5开发
 
 ## 依赖文件如下
