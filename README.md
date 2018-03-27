@@ -2,10 +2,11 @@
 demo.py为录音和语音识别的测试运行文件
 record_demo.py 是录音的测试运行文件
 unit_nlp.py 是SnowNlp的测试运行文件
-unit_nlp.py 是Baidu云NLP识别的测试文件
+unit_nlp_baidu.py 是Baidu云NLP识别的测试文件
 
 server.py 是main文件，服务部分的程序运行该文件
 voice_parse.py为录音和语音识别的class文件和函数文件
+nlp_baidu.py 是利用百度云进行NLP的相关程序，可以直接从提取的汉语文字中进行控制指令的提取
 
 基于Python 3.5开发
 
