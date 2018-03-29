@@ -1,4 +1,4 @@
-#!/usr/bin python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # @Time    : 2018-03-25 9:08
 # @Author  : Joseph Wang

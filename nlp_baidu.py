@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 from aip import AipNlp
 from datetime import datetime,timedelta
