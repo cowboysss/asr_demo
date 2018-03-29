@@ -17,9 +17,10 @@ device_table = \
     '室外温度':mi.Temperature2,\
     '室内湿度':mi.Humidity0,\
     '室外湿度':mi.Humidity1,\
-    '电饭煲':mi.Ecooker0\
+    '电饭煲':mi.Ecooker0,\
+    '灯':-1
     }
-days_offset_table = {'明天':1, '后天':2}
+days_offset_table = {'今天': 0, '明天':1, '后天':2}
 hours_offset_base = {'上午':0,'早上':0,'凌晨':0,'下午':12,'晚上':12}
 
 '''
@@ -56,7 +57,10 @@ class Control_Command(object):
         return self._control_params
 
     def __str__(self):
-        return 'Control Command:\n{\n\tTime: %r\n\tAction: %r\n\tDevice: %r\n}' % (self._control_time.strftime("%Y-%m-%d %H:%M:%S") ,self._control_action, self._control_device)
+        if self._control_time is None:
+            return 'Control Command:\n{\n\tTime: Now\n\tAction: %r\n\tDevice: %r\n}' % (self._control_action, self._control_device)
+        else:
+            return 'Control Command:\n{\n\tTime: %r\n\tAction: %r\n\tDevice: %r\n}' % (self._control_time.strftime("%Y-%m-%d %H:%M:%S") ,self._control_action, self._control_device)
 
 '''
 从一句中文消息中，解析出控制指令的类
@@ -75,11 +79,12 @@ class parse_zh(object):
     '''TODO: 需要完善解析的过程'''
     def get_command(self,msg:str)->Control_Command:
         parsed_msg = self.get_words(msg)
+        print(parsed_msg)
         control_time = None
         control_action = None
         control_device = None
         for item in parsed_msg['items']:
-            print(item)
+            # print(item)
             if item['ne']=='TIME':
                 control_time = get_command_time(item['basic_words'])
                 # print('[1] TIME:', control_time)
@@ -95,6 +100,7 @@ class parse_zh(object):
 
 def get_command_time(basic_words:list)->datetime:
     now = datetime.now()
+    control_time_tmp = now
     control_hours_tmp = 0
     control_minute_tmp = 0
     # print(basic_words)
@@ -104,8 +110,8 @@ def get_command_time(basic_words:list)->datetime:
         str = basic_words[i]
         # print(str)
         # print(i)
-        if str=='明天' or str == '后天':
-            control_time_tmp = now+timedelta(days=days_offset_table[str])
+        if str=='明天' or str == '后天' or str == '今天':
+            control_time_tmp = control_time_tmp+timedelta(days=days_offset_table[str])
         elif str=='上午' or str == '下午' or str == '晚上' or str == '凌晨':
             control_hours_tmp = hours_offset_base[str]
             # print(control_hours_tmp)
@@ -211,5 +217,32 @@ def main():
     command = client.get_command('明天晚上十一点五十分关闭电饭煲')
     print(command)
 
+'''
+明天晚上十一点五十分打开电饭煲
+打开卧室灯
+明天上午十点关闭客厅灯
+开门
+关灯
+开灯
+关上卧室灯
+'''
+def test_single(client, msg):
+    command = client.get_command(msg)
+    print(msg,'\n', command)
+
+def unit_test():
+    client =  parse_zh()
+    test_single(client, '明天晚上十一点五十分打开电饭煲')
+    # test_single(client, '打开卧室灯') # 卧室和灯分开解析，初步是第一个名词下一个是否为名词，是就合并在一起作为一个名词
+    # test_single(client, '明天上午十点关闭灯') # 客厅和灯分开
+    # test_single(client, '开门') # 开门是连在一起的
+    # test_single(client, '关灯') # 关灯是连在一起的
+    # test_single(client, '开灯') # 开灯是连在一起的
+    test_single(client, '打开电饭煲')
+    test_single(client, '晚上十点打开灯')
+    test_single(client, '今天晚上十点打开灯')
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    unit_test()
