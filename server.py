@@ -5,6 +5,7 @@
 # @File    : server.py
 
 import voice_parse as vp
+import nlp_baidu as nb
 
 class control_server(object):
     
@@ -12,9 +13,10 @@ class control_server(object):
         '''run mode参数的定义'''
         self.RUN_ONCE=0
         self.RUN_WHEN_KEY_CTRL=1
-
+        self.RUN_WHEN_GET_CHAR=2
         self.client = vp.parse_zh()
-        # TODO: NLP相关类的初始化
+        # NLP相关类的初始化
+        self.nlp_client = nb.ParseCommand()
         # TODO: Iot Interface相关类的初始化
 
 
@@ -33,20 +35,25 @@ class control_server(object):
         3' get control command according to the speech
         4' control device
         '''
-        self.client.record_voice()
-        self.msg,self.num = self.client.get_result()
+        # self.client.record_voice()
+        # self.msg,self.num = self.client.get_result()
+        
+        self.num = 0 # debug code
+        self.msg = '明天晚上十一点五十分关闭电饭煲'
+        
         if self.num!=0:
             print('voice did not parse!')
             self.client.get_voice('未能正确识别语音')
         else:
             print(self.msg,self.num)
-            # TODO: 对msg进行解析并获得control command 
+            # 对msg进行解析并获得control command
+            self.command = self.nlp_client.get_command(self.msg)
             # TODO: 根据control command进行control控制
             self.client.get_voice('识别成功')
 
     def run(self, mode=0):
         '''
-        mode:
+        mode: 
         0 表示只运行一次
         '''
         if mode==self.RUN_ONCE:
@@ -56,9 +63,20 @@ class control_server(object):
                 if self.wait_key_press():
                     self.speech_and_control()
                 else:
-                    # TODO: delay and wait net loop
+                    # TODO: delay and wait next loop
                     pass
-    
+        elif mode == self.RUN_WHEN_GET_CHAR:
+            while 1:
+                input_char = input('X:')
+                if input_char=='x' or input_char=='X':
+                    print('Get correct char!')
+                    self.speech_and_control()
+                elif input_char=='q' or input_char=='Q':
+                    print('Quit Server!')
+                    break
+                else:
+                    # TODO: delay and wait next loop
+                    print('Get wrong char!')    
 
 if __name__=="__main__":
     main_client = control_server()

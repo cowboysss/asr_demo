@@ -66,7 +66,7 @@ class Control_Command(object):
 '''
 从一句中文消息中，解析出控制指令的类
 '''
-class parse_zh(object):
+class ParseCommand(object):
 
     def __init__(self):
         self._APP_ID = '10886222'
@@ -214,7 +214,7 @@ def zh_to_digital(str:str)->int:
 
 ''' NOTICE: 使用本文件NLP的正确姿势 '''
 def main():
-    client = parse_zh()
+    client = ParseCommand()
     command = client.get_command('明天晚上十一点五十分关闭电饭煲')
     print(command)
 
@@ -232,7 +232,7 @@ def test_single(client, msg):
     print(msg,'\n', command)
 
 def unit_test():
-    client =  parse_zh()
+    client =  ParseCommand()
     test_single(client, '明天晚上十一点五十分打开电饭煲')
     # test_single(client, '打开卧室灯') # 卧室和灯分开解析，初步是第一个名词下一个是否为名词，是就合并在一起作为一个名词
     # test_single(client, '明天上午十点关闭灯') # 客厅和灯分开
