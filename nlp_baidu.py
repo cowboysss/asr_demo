@@ -88,9 +88,10 @@ class ParseCommand(object):
 
         # code 20180331
         item_number=len(parsed_msg['items'])
-        for i in range(item_number):
+        i = 0
+        while i < item_number: 
             item=parsed_msg['items'][i]
-            print(item)
+            print(i,item)
             if item['ne']=='TIME':
                 control_time = get_command_time(item['basic_words'])
                 # print('[1] TIME:', control_time)
@@ -107,7 +108,7 @@ class ParseCommand(object):
                 # print('[2] Verb:',control_action)
             elif item['ne']=='' and item['pos']=='n':
                 # 把items中连在一起的名词合并成一个名词，作为设备名，例如客厅灯，床头灯等
-                # 当名词不在列表里面的时候，设备号为-2或者其他
+                # 当名词不在列表里面的时候，设备号为-1
                 device_name_tmp=item['item']
                 item_tmp=parsed_msg['items'][i+1]
                 while item_tmp['ne']=='' and item_tmp['pos']=='n':
@@ -121,6 +122,8 @@ class ParseCommand(object):
                     control_device = mi.NULL_DEVICE
 
                 # print('[3] Device:',control_device)
+                
+            i += 1
         ctrl_command = Control_Command(control_time,control_action,control_device)
         # print(ctrl_command)
         return ctrl_command
@@ -259,15 +262,15 @@ def test_single(client, msg):
 
 def unit_test():
     client =  ParseCommand()
-    test_single(client, '明天晚上十一点五十分打开电饭煲')
+    # test_single(client, '明天晚上十一点五十分打开电饭煲')
     # test_single(client, '打开卧室灯') # 卧室和灯分开解析，初步是第一个名词下一个是否为名词，是就合并在一起作为一个名词
     # test_single(client, '明天上午十点关闭灯') # 客厅和灯分开
     # test_single(client, '开门') # 开门是连在一起的
     # test_single(client, '关灯') # 关灯是连在一起的
     # test_single(client, '开灯') # 开灯是连在一起的
-    test_single(client, '打开电饭煲')
-    test_single(client, '晚上十点打开灯')
-    test_single(client, '今天晚上十点打开灯')
+    # test_single(client, '打开电饭煲')
+    test_single(client, '打开床头灯，')
+    test_single(client, '读取客厅温度，')
 
 
 if __name__ == '__main__':
