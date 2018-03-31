@@ -33,7 +33,10 @@ class parse_zh(object):
             'lan': 'zh',
         })
         print(self._req)
-        return self._req['result'][0],self._req['err_no']
+        if self._req['err_no']==0:
+            return self._req['result'][0],self._req['err_no']
+        else:
+            return None,self._req['err_no']
 
     def get_voice(self, msg):
         self._ret_voice  = self._client.synthesis(msg, 'zh', 1, {
