@@ -5,7 +5,7 @@ from datetime import datetime,timedelta
 import unicodedata
 import machine_id as mi
 
-verb_table = {'打开':1,'开X':1,'开':1,'关闭':0,'关上':0,'关':0,'读取':2,'获取':2}
+verb_table = {'打开':1,'开启':1,'开':1,'关闭':0,'关上':0,'关':0,'读取':2,'获取':2}
 device_table = \
 {\
     '台灯':mi.Desklamp0,\
@@ -98,7 +98,7 @@ class ParseCommand(object):
             elif item['ne']=='' and item['pos']=='v':
                 # 关灯、开灯等词作为动词出现，需提取出设备名 灯、门等 
                 verb_tmp = item['item']
-                if verb_tmp[1] == '灯' or  verb_tmp[1]=='门':
+                if len(verb_tmp)==2 and (verb_tmp[1] == '灯' or  verb_tmp[1]=='门'):
                     control_device = device_table[verb_tmp[1]]
                     control_action = verb_table[verb_tmp[0]]
                 elif verb_tmp in verb_table:
@@ -110,6 +110,10 @@ class ParseCommand(object):
                 # 把items中连在一起的名词合并成一个名词，作为设备名，例如客厅灯，床头灯等
                 # 当名词不在列表里面的时候，设备号为-1
                 device_name_tmp=item['item']
+                # 室外室内的处理
+                item_tmp=parsed_msg['items'][i-1]
+                if item_tmp['ne']=='' and item_tmp['pos']=='s':
+                    device_name_tmp = item_tmp['item']+device_name_tmp
                 item_tmp=parsed_msg['items'][i+1]
                 while item_tmp['ne']=='' and item_tmp['pos']=='n':
                     device_name_tmp+=item_tmp['item']
