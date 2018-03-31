@@ -84,6 +84,24 @@ class ParseCommand(object):
         control_time = None
         control_action = None
         control_device = None
+
+        # code 20180331
+        item_number=len(parsed_msg['items'])
+        for i in range(item_number):
+            item=parsed_msg['items'][i]
+            print(item)
+            if item['ne']=='TIME':
+                control_time = get_command_time(item['basic_words'])
+                # print('[1] TIME:', control_time)
+            elif item['ne']=='' and item['pos']=='v':
+                # TODO:关灯、开灯等词作为动词出现，需提取出设备名 灯、门等 
+                control_action = verb_table[item['item']]
+                # print('[2] Verb:',control_action)
+            elif item['ne']=='' and item['pos']=='n':
+                # TODO:当一堆名词在一起的时候，可以认为是一个专有名词，作为设备名
+                control_device = device_table[item['item']]
+                # print('[3] Device:',control_device)
+        '''before code
         for item in parsed_msg['items']:
             # print(item)
             if item['ne']=='TIME':
@@ -95,6 +113,7 @@ class ParseCommand(object):
             elif item['ne']=='' and item['pos']=='n':
                 control_device = device_table[item['item']]
                 # print('[3] Device:',control_device)
+        '''
         ctrl_command = Control_Command(control_time,control_action,control_device)
         # print(ctrl_command)
         return ctrl_command

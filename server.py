@@ -35,11 +35,8 @@ class control_server(object):
         3' get control command according to the speech
         4' control device
         '''
-        # self.client.record_voice()
-        # self.msg,self.num = self.client.get_result()
-        
-        self.num = 0 # debug code
-        self.msg = '明天晚上十一点五十分关闭电饭煲'
+        self.client.record_voice()
+        self.msg,self.num = self.client.get_result()
         
         if self.num!=0:
             print('voice did not parse!')
@@ -48,6 +45,7 @@ class control_server(object):
             print(self.msg,self.num)
             # 对msg进行解析并获得control command
             self.command = self.nlp_client.get_command(self.msg)
+            print(self.command)
             # TODO: 根据control command进行control控制
             self.client.get_voice('识别成功')
 
@@ -75,9 +73,9 @@ class control_server(object):
                     print('Quit Server!')
                     break
                 else:
-                    # TODO: delay and wait next loop
+                    # skip parse the voice 
                     print('Get wrong char!')    
 
 if __name__=="__main__":
     main_client = control_server()
-    main_client.run()
+    main_client.run(main_client.RUN_WHEN_GET_CHAR)
