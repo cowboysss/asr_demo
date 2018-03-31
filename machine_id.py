@@ -4,6 +4,8 @@
 
 class machine_id():
     def __init__(self):
+        self.NULL_DEVICE = -1
+        self.AllLamp = 0
         self.Desklamp0 = 1
         self.Bedlamp0  = 2
         self.SittingroomLight0 = 3 
@@ -16,6 +18,8 @@ class machine_id():
         self.Humidity1 = 10
         self.Ecooker0 = 11
 
+NULL_DEVICE = -1
+AllLamp = 0
 Desklamp0 = 1
 Bedlamp0  = 2
 SittingroomLight0 = 3 

@@ -72,7 +72,6 @@ class parse_zh(object):
         stream.close()
         pa.terminate()
     
-        # datetime.now().strftime("%Y-%m-%d_%H_%M_%S")+".wav"
         self.save_wave_file(self._record_speech_name, save_buffer)
         save_buffer = []
         print(self._record_speech_name, "saved")

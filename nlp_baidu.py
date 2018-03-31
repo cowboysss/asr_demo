@@ -5,7 +5,7 @@ from datetime import datetime,timedelta
 import unicodedata
 import machine_id as mi
 
-verb_table = {'打开':1,'开X':1,'开':1,'关闭':0,'关上':0,'关':0}
+verb_table = {'打开':1,'开X':1,'开':1,'关闭':0,'关上':0,'关':0,'读取':2,'获取':2}
 device_table = \
 {\
     '台灯':mi.Desklamp0,\
@@ -13,13 +13,14 @@ device_table = \
     '客厅灯':mi.SittingroomLight0,\
     '房门':mi.BedroomAccess,\
     '空调':mi.Aircontion0,\
-    '房间内温度':mi.Temperature0,\
+    '房间温度':mi.Temperature0,\
     '客厅温度':mi.Temperature1,\
     '室外温度':mi.Temperature2,\
     '室内湿度':mi.Humidity0,\
     '室外湿度':mi.Humidity1,\
     '电饭煲':mi.Ecooker0,\
-    '灯':-1
+    '灯':mi.AllLamp,\
+    '门':mi.BedroomAccess\
     }
 days_offset_table = {'今天': 0, '明天':1, '后天':2}
 hours_offset_base = {'上午':0,'早上':0,'凌晨':0,'下午':12,'晚上':12}
@@ -94,26 +95,32 @@ class ParseCommand(object):
                 control_time = get_command_time(item['basic_words'])
                 # print('[1] TIME:', control_time)
             elif item['ne']=='' and item['pos']=='v':
-                # TODO:关灯、开灯等词作为动词出现，需提取出设备名 灯、门等 
-                control_action = verb_table[item['item']]
+                # 关灯、开灯等词作为动词出现，需提取出设备名 灯、门等 
+                verb_tmp = item['item']
+                if verb_tmp[1] == '灯' or  verb_tmp[1]=='门':
+                    control_device = device_table[verb_tmp[1]]
+                    control_action = verb_table[verb_tmp[0]]
+                elif verb_tmp in verb_table:
+                    control_action = verb_table[verb_tmp]
+                else:
+                    control_action = -1
                 # print('[2] Verb:',control_action)
             elif item['ne']=='' and item['pos']=='n':
-                # TODO:当一堆名词在一起的时候，可以认为是一个专有名词，作为设备名
-                control_device = device_table[item['item']]
+                # 把items中连在一起的名词合并成一个名词，作为设备名，例如客厅灯，床头灯等
+                # 当名词不在列表里面的时候，设备号为-2或者其他
+                device_name_tmp=item['item']
+                item_tmp=parsed_msg['items'][i+1]
+                while item_tmp['ne']=='' and item_tmp['pos']=='n':
+                    device_name_tmp+=item_tmp['item']
+                    i+=1
+                    item_tmp=parsed_msg['items'][i+1]
+                print(i,device_name_tmp)
+                if device_name_tmp in device_table:
+                    control_device = device_table[device_name_tmp]
+                else:
+                    control_device = mi.NULL_DEVICE
+
                 # print('[3] Device:',control_device)
-        '''before code
-        for item in parsed_msg['items']:
-            # print(item)
-            if item['ne']=='TIME':
-                control_time = get_command_time(item['basic_words'])
-                # print('[1] TIME:', control_time)
-            elif item['ne']=='' and item['pos']=='v':
-                control_action = verb_table[item['item']]
-                # print('[2] Verb:',control_action)
-            elif item['ne']=='' and item['pos']=='n':
-                control_device = device_table[item['item']]
-                # print('[3] Device:',control_device)
-        '''
         ctrl_command = Control_Command(control_time,control_action,control_device)
         # print(ctrl_command)
         return ctrl_command
