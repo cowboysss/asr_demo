@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 from aip import AipSpeech
-from playsound import playsound
 import wave
 from pyaudio import PyAudio,paInt16
 import os
@@ -27,7 +26,6 @@ class parse_zh(object):
             return fp.read()
     
     def get_result(self):
-        # self.record_voice()
         print('parsing speech...')
         self._req = self._client.asr(self.get_file_content("recorded_speech.pcm"), 'pcm', 16000, {
             'lan': 'zh',
@@ -46,7 +44,6 @@ class parse_zh(object):
             with open('audio.mp3', 'wb') as f:
                 f.write(self._ret_voice)
             os.system('omxplayer audio.mp3')
-            # playsound('audio.mp3')
         return self._ret_voice
 
     def save_wave_file(self,filename, data):

@@ -17,7 +17,7 @@ class control_server(object):
         self.client = vp.parse_zh()
         # NLP相关类的初始化
         self.nlp_client = nb.ParseCommand()
-        # TODO: Iot Interface相关类的初始化
+        # TODO: 控制部分相关类的初始化
 
 
     def wait_key_press(self):

@@ -86,7 +86,6 @@ class ParseCommand(object):
         control_action = None
         control_device = None
 
-        # code 20180331
         item_number=len(parsed_msg['items'])
         i = 0
         while i < item_number: 
